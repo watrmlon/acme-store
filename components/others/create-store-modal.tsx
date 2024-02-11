@@ -47,9 +47,7 @@ export function CreateStoreModal() {
     try {
       setIsLoading(true);
       const res = await axios.post("/api/stores/v1", values);
-      toast.success("Store created🎉.", {
-        description: `Store ${values.name} was created successfully.`,
-      });
+      window.location.assign(`/${res.data.id}`)
     } catch (error) {
       toast.error("Failed to create store.", {
         description: `Could not create store ${values.name}, please try again later.`,
