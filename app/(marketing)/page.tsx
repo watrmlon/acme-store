@@ -1,23 +1,17 @@
-import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+"use client"
 
-import { Button } from "@/components/ui/button";
+import React from "react";
+import { useModalStore } from "@/hooks/use-modal-store";
 
 export default function Home() {
-  return (
-    <main className="flex flex-col items-center justify-between min-h-screen p-24">
-      <div className="px-5 py-2 border-2 rounded-lg border-border bg-muted">
-        <div className="flex items-center gap-x-4">
-          <h1 className="text-lg font-medium">Welcome to PeakBuy</h1>
-          <SignedIn>
-            <UserButton afterSignOutUrl="/" />
-          </SignedIn>
-          <SignedOut>
-            <SignInButton>
-              <Button variant='default' size='sm'>Sign in</Button>
-            </SignInButton>
-          </SignedOut>
-        </div>
-      </div>
-    </main>
-  );
+  const onOpen = useModalStore((state) => state.onOpen);
+  const isOpen = useModalStore((state) => state.isOpen);
+
+  React.useEffect(() => {
+    if (!isOpen) {
+      onOpen();
+    }
+  }, [isOpen, onOpen]);
+  
+  return null;
 }
