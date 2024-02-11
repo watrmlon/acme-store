@@ -3,7 +3,6 @@
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -12,7 +11,11 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { LoaderIcon } from "lucide-react";
 import { Modal } from "@/components/shared/modal";
+import React from "react";
+import axios from "axios";
+import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { useModalStore } from "@/hooks/use-modal-store";
 import { z } from "zod";
@@ -24,13 +27,14 @@ const createStoreSchema = z.object({
     .min(2, {
       message: "Must be at least 2 or more characters",
     })
-    .max(25, { message: "Must be at most 25 or less characters" }),
+    .max(52, { message: "Must be at most 52 or less characters" }),
 });
 
 type CreateStoreSchema = z.infer<typeof createStoreSchema>;
 
 export function CreateStoreModal() {
   const _create_store_modal = useModalStore();
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   const form = useForm<CreateStoreSchema>({
     resolver: zodResolver(createStoreSchema),
@@ -40,7 +44,19 @@ export function CreateStoreModal() {
   });
 
   async function onSubmit(values: CreateStoreSchema) {
-    console.log(values);
+    try {
+      setIsLoading(true);
+      const res = await axios.post("/api/stores/v1", values);
+      toast.success("Store created🎉.", {
+        description: `Store ${values.name} was created successfully.`,
+      });
+    } catch (error) {
+      toast.error("Failed to create store.", {
+        description: `Could not create store ${values.name}, please try again later.`,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -69,11 +85,17 @@ export function CreateStoreModal() {
             <Button
               type="button"
               variant="ghost"
+              disabled={isLoading}
               onClick={_create_store_modal.onClose}
             >
               Cancel
             </Button>
-            <Button type="submit">Create</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? (
+                <LoaderIcon className="w-5 h-5 mr-2 animate-spin" />
+              ) : null}
+              Create
+            </Button>
           </div>
         </form>
       </Form>
